@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Events API Documentation</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; line-height: 1.6; color: #333; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px 20px; text-align: center; margin-bottom: 30px; border-radius: 8px; }
+        h1 { font-size: 2.5em; margin-bottom: 10px; }
+        h2 { color: #667eea; margin-top: 30px; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #667eea; }
+        h3 { color: #764ba2; margin-top: 20px; margin-bottom: 10px; }
+        .module { background: white; padding: 25px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .function { background: #f9f9f9; padding: 15px; margin: 15px 0; border-left: 4px solid #667eea; border-radius: 4px; }
+        .signature { background: #2d2d2d; color: #f8f8f2; padding: 12px; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 14px; overflow-x: auto; margin: 10px 0; }
+        .param { margin: 8px 0; padding-left: 20px; }
+        .param-name { color: #667eea; font-weight: bold; }
+        .returns { background: #e8f5e9; padding: 10px; border-radius: 4px; margin: 10px 0; }
+        code { background: #f4f4f4; padding: 2px 6px; border-radius: 3px; font-family: 'Courier New', monospace; }
+        .endpoint { background: #fff3cd; padding: 10px; border-radius: 4px; margin: 10px 0; border-left: 4px solid #ffc107; }
+        .model { background: #e3f2fd; padding: 15px; border-radius: 4px; margin: 15px 0; }
+        .field { margin: 8px 0; padding-left: 20px; }
+        .field-name { color: #1976d2; font-weight: bold; }
+        .badge { display: inline-block; padding: 3px 8px; border-radius: 3px; font-size: 12px; font-weight: bold; margin-right: 5px; }
+        .badge-get { background: #61affe; color: white; }
+        .badge-post { background: #49cc90; color: white; }
+        .badge-put { background: #fca130; color: white; }
+        .badge-delete { background: #f93e3e; color: white; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📚 Events API Documentation</h1>
+            <p>Complete API reference for the Events Management System</p>
+        </header>
+
+        <div class="module">
+            <h2>📦 Module: main.py</h2>
+            <p>FastAPI application entry point with CORS configuration and global exception handlers.</p>
+            
+            <div class="function">
+                <h3>FastAPI Application</h3>
+                <div class="signature">app = FastAPI(
+    title="Events API",
+    description="REST API for managing events with DynamoDB",
+    version="1.0.0",
+    redirect_slashes=False
+)</div>
+                <p><strong>Features:</strong></p>
+                <ul>
+                    <li>CORS middleware with configurable origins</li>
+                    <li>Global validation error handler</li>
+                    <li>Global exception handler</li>
+                    <li>Automatic API documentation at /docs</li>
+                </ul>
+            </div>
+
+            <div class="function">
+                <h3>validation_exception_handler(request, exc)</h3>
+                <p>Handles Pydantic validation errors with detailed field-level error messages.</p>
+                <div class="param">
+                    <span class="param-name">request:</span> FastAPI Request object
+                </div>
+                <div class="param">
+                    <span class="param-name">exc:</span> RequestValidationError exception
+                </div>
+                <div class="returns">
+                    <strong>Returns:</strong> JSONResponse with status 422 and detailed error information
+                </div>
+            </div>
+
+            <div class="function">
+                <h3>general_exception_handler(request, exc)</h3>
+                <p>Catches unexpected errors and returns a generic error response.</p>
+                <div class="param">
+                    <span class="param-name">request:</span> FastAPI Request object
+                </div>
+                <div class="param">
+                    <span class="param-name">exc:</span> Exception object
+                </div>
+                <div class="returns">
+                    <strong>Returns:</strong> JSONResponse with status 500
+                </div>
+            </div>
+        </div>
+
+        <div class="module">
+            <h2>📦 Module: models.py</h2>
+            <p>Pydantic models for request/response validation and data serialization.</p>
+
+            <div class="model">
+                <h3>EventBase</h3>
+                <p>Base model with common event fields and validation rules.</p>
+                <div class="field">
+                    <span class="field-name">title:</span> str (1-200 chars) - Event title
+                </div>
+                <div class="field">
+                    <span class="field-name">description:</span> str (1-2000 chars) - Event description
+                </div>
+                <div class="field">
+                    <span class="field-name">date:</span> str (ISO format) - Event date (YYYY-MM-DD)
+                </div>
+                <div class="field">
+                    <span class="field-name">location:</span> str (1-300 chars) - Event location
+                </div>
+                <div class="field">
+                    <span class="field-name">capacity:</span> int (1-100,000) - Event capacity
+                </div>
+                <div class="field">
+                    <span class="field-name">organizer:</span> str (1-200 chars) - Event organizer
+                </div>
+                <div class="field">
+                    <span class="field-name">status:</span> str - Event status (active, cancelled, completed, postponed)
+                </div>
+                <p><strong>Validators:</strong></p>
+                <ul>
+                    <li><code>validate_date()</code> - Ensures date is in ISO format</li>
+                    <li><code>validate_status()</code> - Ensures status is one of allowed values</li>
+                </ul>
+            </div>
+
+            <div class="model">
+                <h3>EventCreate</h3>
+                <p>Model for creating new events. Extends EventBase.</p>
+                <div class="field">
+                    <span class="field-name">eventId:</span> Optional[str] - Custom event ID (auto-generated if not provided)
+                </div>
+            </div>
+
+            <div class="model">
+                <h3>EventUpdate</h3>
+                <p>Model for updating existing events. All fields are optional.</p>
+                <div class="field">
+                    <span class="field-name">title:</span> Optional[str] (1-200 chars)
+                </div>
+                <div class="field">
+                    <span class="field-name">description:</span> Optional[str] (1-2000 chars)
+                </div>
+                <div class="field">
+                    <span class="field-name">date:</span> Optional[str] (ISO format)
+                </div>
+                <div class="field">
+                    <span class="field-name">location:</span> Optional[str] (1-300 chars)
+                </div>
+                <div class="field">
+                    <span class="field-name">capacity:</span> Optional[int] (1-100,000)
+                </div>
+                <div class="field">
+                    <span class="field-name">organizer:</span> Optional[str] (1-200 chars)
+                </div>
+                <div class="field">
+                    <span class="field-name">status:</span> Optional[str]
+                </div>
+            </div>
+
+            <div class="model">
+                <h3>Event</h3>
+                <p>Complete event model with ID. Extends EventBase.</p>
+                <div class="field">
+                    <span class="field-name">eventId:</span> str - Unique event identifier (UUID)
+                </div>
+            </div>
+        </div>
+
+        <div class="module">
+            <h2>📦 Module: routes.py</h2>
+            <p>API endpoint definitions with request handling and error management.</p>
+
+            <div class="function">
+                <h3><span class="badge badge-post">POST</span> create_event(event: EventCreate)</h3>
+                <div class="endpoint">
+                    <strong>Endpoint:</strong> <code>POST /events</code>
+                </div>
+                <p>Creates a new event in the database.</p>
+                <div class="param">
+                    <span class="param-name">event:</span> EventCreate - Event data to create
+                </div>
+                <div class="returns">
+                    <strong>Returns:</strong> Event (201 Created) - Created event with generated ID
+                </div>
+                <p><strong>Error Responses:</strong></p>
+                <ul>
+                    <li>422 - Validation error</li>
+                    <li>500 - Internal server error</li>
+                </ul>
+            </div>
+
+            <div class="function">
+                <h3><span class="badge badge-get">GET</span> list_events(status: Optional[str])</h3>
+                <div class="endpoint">
+                    <strong>Endpoint:</strong> <code>GET /events</code>
+                </div>
+                <p>Retrieves all events, optionally filtered by status.</p>
+                <div class="param">
+                    <span class="param-name">status:</span> Optional[str] - Filter by status (query parameter)
+                </div>
+                <div class="returns">
+                    <strong>Returns:</strong> List[Event] (200 OK) - List of events
+                </div>
+                <p><strong>Error Responses:</strong></p>
+                <ul>
+                    <li>500 - Internal server error</li>
+                </ul>
+            </div>
+
+            <div class="function">
+                <h3><span class="badge badge-get">GET</span> get_event(event_id: str)</h3>
+                <div class="endpoint">
+                    <strong>Endpoint:</strong> <code>GET /events/{event_id}</code>
+                </div>
+                <p>Retrieves a specific event by ID.</p>
+                <div class="param">
+                    <span class="param-name">event_id:</span> str - Event identifier (path parameter)
+                </div>
+                <div class="returns">
+                    <strong>Returns:</strong> Event (200 OK) - Event details
+                </div>
+                <p><strong>Error Responses:</strong></p>
+                <ul>
+                    <li>400 - Invalid event ID</li>
+                    <li>404 - Event not found</li>
+                    <li>500 - Internal server error</li>
+                </ul>
+            </div>
+
+            <div class="function">
+                <h3><span class="badge badge-put">PUT</span> update_event(event_id: str, event_update: EventUpdate)</h3>
+                <div class="endpoint">
+                    <strong>Endpoint:</strong> <code>PUT /events/{event_id}</code>
+                </div>
+                <p>Updates an existing event. Only provided fields are updated.</p>
+                <div class="param">
+                    <span class="param-name">event_id:</span> str - Event identifier (path parameter)
+                </div>
+                <div class="param">
+                    <span class="param-name">event_update:</span> EventUpdate - Fields to update
+                </div>
+                <div class="returns">
+                    <strong>Returns:</strong> Event (200 OK) - Updated event
+                </div>
+                <p><strong>Error Responses:</strong></p>
+                <ul>
+                    <li>400 - Invalid event ID or no fields provided</li>
+                    <li>404 - Event not found</li>
+                    <li>422 - Validation error</li>
+                    <li>500 - Internal server error</li>
+                </ul>
+            </div>
+
+            <div class="function">
+                <h3><span class="badge badge-delete">DELETE</span> delete_event(event_id: str)</h3>
+                <div class="endpoint">
+                    <strong>Endpoint:</strong> <code>DELETE /events/{event_id}</code>
+                </div>
+                <p>Deletes an event from the database.</p>
+                <div class="param">
+                    <span class="param-name">event_id:</span> str - Event identifier (path parameter)
+                </div>
+                <div class="returns">
+                    <strong>Returns:</strong> None (204 No Content) - Event deleted successfully
+                </div>
+                <p><strong>Error Responses:</strong></p>
+                <ul>
+                    <li>400 - Invalid event ID</li>
+                    <li>404 - Event not found</li>
+                    <li>500 - Internal server error</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="module">
+            <h2>📦 Module: database.py</h2>
+            <p>DynamoDB operations for event persistence.</p>
+
+            <div class="function">
+                <h3>create_event(event: EventCreate) → Event</h3>
+                <p>Creates a new event in DynamoDB.</p>
+                <div class="param">
+                    <span class="param-name">event:</span> EventCreate - Event data
+                </div>
+                <div class="returns">
+                    <strong>Returns:</strong> Event - Created event with ID
+                </div>
+                <p><strong>Behavior:</strong> Uses provided eventId or generates a UUID if not provided.</p>
+            </div>
+
+            <div class="function">
+                <h3>get_event(event_id: str) → Optional[Event]</h3>
+                <p>Retrieves an event by ID from DynamoDB.</p>
+                <div class="param">
+                    <span class="param-name">event_id:</span> str - Event identifier
+                </div>
+                <div class="returns">
+                    <strong>Returns:</strong> Optional[Event] - Event if found, None otherwise
+                </div>
+            </div>
+
+            <div class="function">
+                <h3>list_events() → List[Event]</h3>
+                <p>Retrieves all events from DynamoDB.</p>
+                <div class="returns">
+                    <strong>Returns:</strong> List[Event] - All events in the table
+                </div>
+                <p><strong>Note:</strong> Uses DynamoDB scan operation.</p>
+            </div>
+
+            <div class="function">
+                <h3>update_event(event_id: str, event_update: EventUpdate) → Optional[Event]</h3>
+                <p>Updates an existing event in DynamoDB.</p>
+                <div class="param">
+                    <span class="param-name">event_id:</span> str - Event identifier
+                </div>
+                <div class="param">
+                    <span class="param-name">event_update:</span> EventUpdate - Fields to update
+                </div>
+                <div class="returns">
+                    <strong>Returns:</strong> Optional[Event] - Updated event if successful, None otherwise
+                </div>
+                <p><strong>Behavior:</strong> Only updates fields that are not None in event_update.</p>
+            </div>
+
+            <div class="function">
+                <h3>delete_event(event_id: str) → bool</h3>
+                <p>Deletes an event from DynamoDB.</p>
+                <div class="param">
+                    <span class="param-name">event_id:</span> str - Event identifier
+                </div>
+                <div class="returns">
+                    <strong>Returns:</strong> bool - True if successful, False otherwise
+                </div>
+            </div>
+        </div>
+
+        <div class="module">
+            <h2>📦 Module: lambda_handler.py</h2>
+            <p>AWS Lambda entry point using Mangum adapter.</p>
+            
+            <div class="function">
+                <h3>handler</h3>
+                <div class="signature">handler = Mangum(app, lifespan="off")</div>
+                <p>Lambda handler function that wraps the FastAPI application using Mangum.</p>
+                <p><strong>Purpose:</strong> Converts AWS Lambda events to ASGI format for FastAPI.</p>
+            </div>
+        </div>
+
+        <footer style="text-align: center; padding: 40px 20px; color: #666; margin-top: 40px;">
+            <p>Generated for Events API - AWS re:Invent 2025 Workshop</p>
+            <p>For interactive API documentation, visit: <code>/docs</code> endpoint</p>
+        </footer>
+    </div>
+</body>
+</html>
